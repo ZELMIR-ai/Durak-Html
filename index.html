@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Дурак</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --green: #1a5c35;
+    --green-light: #2d7a4a;
+    --green-felt: #1e6b3e;
+    --gold: #d4a017;
+    --gold-light: #f0c040;
+    --red: #c0392b;
+    --black: #0d0d0d;
+    --white: #f5f0e8;
+    --card-w: 52px;
+    --card-h: 76px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+
+  body {
+    background: var(--green);
+    font-family: 'Inter', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── LOBBY ─── */
+  #screen-lobby {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px 20px;
+    gap: 0;
+    background: radial-gradient(ellipse at 50% 0%, #2d7a4a 0%, #0d2e1a 100%);
+  }
+
+  .logo {
+    font-family: 'Unbounded', cursive;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: var(--gold-light);
+    text-shadow: 0 4px 20px rgba(212,160,23,0.5), 0 0 60px rgba(212,160,23,0.2);
+    margin-bottom: 4px;
+    animation: logoGlow 3s ease-in-out infinite;
+  }
+  .logo-sub {
+    font-size: 12px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    margin-bottom: 40px;
+  }
+
+  @keyframes logoGlow {
+    0%, 100% { text-shadow: 0 4px 20px rgba(212,160,23,0.5); }
+    50% { text-shadow: 0 4px 40px rgba(212,160,23,0.9), 0 0 80px rgba(212,160,23,0.4); }
+  }
+
+  .card-art {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+  .deco-card {
+    width: 44px; height: 64px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background: var(--white);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: floatCard 3s ease-in-out infinite;
+  }
+  .deco-card:nth-child(2) { animation-delay: .4s; transform: rotate(-6deg); }
+  .deco-card:nth-child(3) { animation-delay: .8s; }
+  .deco-card:nth-child(4) { animation-delay: 1.2s; transform: rotate(6deg); }
+
+  @keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .deco-card:nth-child(2) { animation-name: floatCard2; }
+  .deco-card:nth-child(4) { animation-name: floatCard4; }
+  @keyframes floatCard2 {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50% { transform: translateY(-8px) rotate(-6deg); }
+  }
+  @keyframes floatCard4 {
+    0%, 100% { transform: translateY(0) rotate(6deg); }
+    50% { transform: translateY(-5px) rotate(6deg); }
+  }
+
+  .menu-card {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(10px);
+  }
+  .menu-card h3 {
+    font-family: 'Unbounded', cursive;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .mode-select {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 10px 6px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(245,240,232,0.6);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+  }
+  .mode-btn.active {
+    border-color: var(--gold);
+    background: rgba(212,160,23,0.15);
+    color: var(--gold-light);
+  }
+  .mode-btn .mode-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+  .btn {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'Unbounded', cursive;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .btn:last-child { margin-bottom: 0; }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: var(--black);
+    box-shadow: 0 4px 20px rgba(212,160,23,0.4);
+  }
+  .btn-gold:active { transform: scale(0.97); }
+  .btn-outline {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.25);
+    color: var(--white);
+  }
+  .btn-outline:active { background: rgba(255,255,255,0.07); }
+
+  .input-field {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.2);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color .2s;
+  }
+  .input-field:focus { border-color: var(--gold); }
+  .input-field::placeholder { color: rgba(245,240,232,0.35); }
+
+  /* ─── WAITING ROOM ─── */
+  #screen-waiting {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 30px 20px;
+    background: radial-gradient(ellipse at 50% 0%, #2d7a4a 0%, #0d2e1a 100%);
+  }
+  .waiting-title {
+    font-family: 'Unbounded', cursive;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+  .room-code-display {
+    font-family: 'Unbounded', cursive;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    color: var(--white);
+    margin: 20px 0;
+    padding: 16px 32px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    position: relative;
+  }
+  .room-code-display .copy-hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: block;
+    margin-top: 4px;
+  }
+  .players-list {
+    width: 100%;
+    max-width: 360px;
+    margin: 16px 0;
+  }
+  .player-slot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 8px;
+    transition: all .2s;
+  }
+  .player-slot.ready { border-color: rgba(45,122,74,0.6); background: rgba(45,122,74,0.2); }
+  .player-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: var(--black);
+  }
+  .player-name { font-weight: 600; flex: 1; }
+  .ready-badge {
+    font-size: 11px;
+    color: #2ecc71;
+    font-weight: 600;
+  }
+
+  /* ─── GAME TABLE ─── */
+  #screen-game {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 100% 60% at 50% 50%, #2d7a4a 0%, #1a5c35 60%, #0d2e1a 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Felt texture */
+  #screen-game::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 0, transparent 50%);
+    background-size: 8px 8px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .game-inner { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column; }
+
+  /* Top bar */
+  .game-top {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(8px);
+  }
+  .trump-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .trump-card-mini {
+    width: 28px; height: 40px;
+    border-radius: 5px;
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .deck-count {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+  .turn-info {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  /* Opponents area */
+  .opponents-area {
+    padding: 10px 12px 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .opponent-box {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 70px;
+    transition: border-color .3s;
+  }
+  .opponent-box.is-attacker { border-color: var(--gold); }
+  .opponent-box.is-defender { border-color: #e74c3c; }
+  .opp-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .opp-cards { display: flex; gap: -6px; }
+  .opp-card-back {
+    width: 20px; height: 30px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #1a3a6b 0%, #2d5aa0 100%);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    margin-left: -8px;
+  }
+  .opp-card-back:first-child { margin-left: 0; }
+  .role-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .role-atk { background: rgba(212,160,23,0.3); color: var(--gold); }
+  .role-def { background: rgba(231,76,60,0.3); color: #e74c3c; }
+
+  /* Table area */
+  .table-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    position: relative;
+  }
+
+  .table-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 340px;
+  }
+
+  .table-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: var(--card-w);
+  }
+
+  /* Cards */
+  .card {
+    width: var(--card-w);
+    height: var(--card-h);
+    border-radius: 8px;
+    background: var(--white);
+    border: 1.5px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 4px 5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+    cursor: pointer;
+    user-select: none;
+    transition: transform .15s, box-shadow .15s;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .card:active { transform: scale(0.96); }
+  .card.selected {
+    transform: translateY(-12px);
+    box-shadow: 0 12px 30px rgba(212,160,23,0.5);
+    border-color: var(--gold);
+  }
+  .card.defense-slot {
+    position: absolute;
+    top: 20px;
+    left: 8px;
+    cursor: default;
+  }
+  .card.red { color: var(--red); }
+  .card.black { color: #111; }
+  .card-corner { font-size: 13px; line-height: 1; }
+  .card-suit-center { font-size: 24px; text-align: center; flex: 1; display: flex; align-items: center; justify-content: center; }
+  .card-corner.bottom { transform: rotate(180deg); align-self: flex-end; }
+
+  .defense-pair {
+    position: relative;
+    width: var(--card-w);
+    height: calc(var(--card-h) + 24px);
+  }
+
+  /* Action buttons */
+  .action-bar {
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Unbounded', cursive;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: 0.3px;
+  }
+  .action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-take { background: #e74c3c; color: white; }
+  .btn-beat { background: var(--gold); color: var(--black); }
+  .btn-end { background: #2ecc71; color: var(--black); }
+  .btn-transfer { background: #9b59b6; color: white; }
+  .action-btn:not(:disabled):active { transform: scale(0.95); }
+
+  /* My hand */
+  .my-hand-area {
+    padding: 10px 12px 16px;
+    position: relative;
+  }
+  .hand-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .my-hand {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .my-hand::-webkit-scrollbar { display: none; }
+  .my-hand .card { flex-shrink: 0; }
+
+  /* Status message */
+  .status-msg {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.3);
+    color: var(--gold-light);
+    max-width: 280px;
+    margin: 0 auto 8px;
+  }
+
+  /* ─── MODALS ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal {
+    background: linear-gradient(180deg, #1e6b3e 0%, #0d2e1a 100%);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 32px 28px;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+  }
+  .modal-icon { font-size: 56px; margin-bottom: 12px; }
+  .modal-title {
+    font-family: 'Unbounded', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .modal-sub { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 24px; }
+
+  /* ─── LOADER ─── */
+  .loader {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(13,45,26,0.9);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    font-family: 'Unbounded', cursive;
+    font-size: 14px;
+    color: var(--gold);
+  }
+  .loader.visible { display: flex; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid rgba(212,160,23,0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    background: rgba(20,20,20,0.95);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.1);
+    z-index: 300;
+    transition: transform .3s ease;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .searching-dots::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+  @keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+  }
+
+  .discard-pile {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    text-align: center;
+  }
+  .discard-pile .card {
+    cursor: default;
+    opacity: 0.5;
+  }
+  .discard-count {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── LOADER ─── -->
+<div class="loader" id="loader">
+  <div class="spinner"></div>
+  <span id="loader-text">Подключение...</span>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<!-- ─── SCREEN: LOBBY ─── -->
+<div id="screen-lobby">
+  <div class="logo">🃏 ДУРАК</div>
+  <div class="logo-sub">Классическая карточная игра</div>
+
+  <div class="card-art">
+    <div class="deco-card">♠</div>
+    <div class="deco-card" style="color:var(--red)">♥</div>
+    <div class="deco-card" style="color:var(--red)">♦</div>
+    <div class="deco-card">♣</div>
+  </div>
+
+  <!-- Выбор режима игры -->
+  <div class="menu-card">
+    <h3>Режим игры</h3>
+    <div class="mode-select">
+      <button class="mode-btn active" id="mode-podkidnoy" onclick="selectMode('podkidnoy')">
+        <span class="mode-icon">🃏</span>Подкидной
+      </button>
+      <button class="mode-btn" id="mode-perevodnoj" onclick="selectMode('perevodnoj')">
+        <span class="mode-icon">🔄</span>Переводной
+      </button>
+    </div>
+  </div>
+
+  <!-- Быстрая игра -->
+  <div class="menu-card">
+    <h3>🎲 Быстрая игра</h3>
+    <button class="btn btn-gold" onclick="startMatchmaking()">Найти соперника</button>
+  </div>
+
+  <!-- С друзьями -->
+  <div class="menu-card">
+    <h3>👥 С друзьями</h3>
+    <button class="btn btn-gold" onclick="createRoom()">Создать комнату</button>
+    <input type="text" class="input-field" id="room-code-input" placeholder="Код комнаты (напр. AB12CD)" maxlength="6" style="text-transform:uppercase; margin-top:8px">
+    <button class="btn btn-outline" onclick="joinRoom()">Войти в комнату</button>
+  </div>
+</div>
+
+<!-- ─── SCREEN: WAITING ROOM ─── -->
+<div id="screen-waiting" style="display:none; flex-direction:column; align-items:center; min-height:100vh; padding:30px 20px; background:radial-gradient(ellipse at 50% 0%, #2d7a4a 0%, #0d2e1a 100%);">
+  <div class="waiting-title" id="waiting-title">Комната создана!</div>
+  <div style="color:rgba(255,255,255,0.5); font-size:13px; margin-bottom:8px;">Поделитесь кодом с друзьями</div>
+  <div class="room-code-display" id="room-code-display" onclick="copyRoomCode()">
+    <span id="room-code-text">------</span>
+    <span class="copy-hint">нажми, чтобы скопировать</span>
+  </div>
+  <div style="font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:16px;" id="waiting-mode-label">Подкидной дурак • 2–6 игроков</div>
+
+  <div class="players-list" id="players-list"></div>
+
+  <div style="width:100%; max-width:360px;">
+    <button class="btn btn-gold" id="ready-btn" onclick="setReady()">✓ Готов играть</button>
+    <button class="btn btn-outline" onclick="leaveRoom()" style="margin-top:8px">← Выйти</button>
+  </div>
+  <div id="waiting-status" style="margin-top:16px; font-size:13px; color:var(--gold); text-align:center;"></div>
+</div>
+
+<!-- ─── SCREEN: GAME ─── -->
+<div id="screen-game">
+  <div class="game-inner">
+    <!-- Top bar -->
+    <div class="game-top">
+      <div class="trump-display">
+        <div class="trump-card-mini" id="trump-card-mini">?</div>
+        <div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.5);">Козырь</div>
+          <div id="trump-label" style="font-size:14px; font-weight:700;">—</div>
+        </div>
+      </div>
+      <div class="turn-info" id="turn-info">Ход 1</div>
+      <div class="deck-count">
+        🂠 <span id="deck-count">36</span>
+        <br><span style="font-size:10px; color:rgba(255,255,255,0.4);">в колоде</span>
+      </div>
+    </div>
+
+    <!-- Opponents -->
+    <div class="opponents-area" id="opponents-area"></div>
+
+    <!-- Table -->
+    <div class="table-area">
+      <div class="status-msg" id="status-msg">Ожидание хода...</div>
+      <div class="table-slots" id="table-slots"></div>
+      <div class="discard-pile" id="discard-pile" style="display:none">
+        <div class="card black" style="cursor:default; opacity:0.4; width:36px; height:52px; font-size:9px;">
+          <div>🗑</div>
+        </div>
+        <div class="discard-count" id="discard-count">0</div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-bar" id="action-bar"></div>
+
+    <!-- My hand -->
+    <div class="my-hand-area">
+      <div class="hand-label">Ваши карты</div>
+      <div class="my-hand" id="my-hand"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODALS ─── -->
+<div class="modal-overlay" id="modal-gameover">
+  <div class="modal">
+    <div class="modal-icon" id="gameover-icon">🎉</div>
+    <div class="modal-title" id="gameover-title">Победа!</div>
+    <div class="modal-sub" id="gameover-sub">Вы не дурак!</div>
+    <button class="btn btn-gold" onclick="location.reload()">Играть снова</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-disconnect">
+  <div class="modal">
+    <div class="modal-icon">📡</div>
+    <div class="modal-title">Игрок вышел</div>
+    <div class="modal-sub" id="disconnect-msg">Соперник покинул игру</div>
+    <button class="btn btn-gold" onclick="location.reload()">В меню</button>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───
+const WS_URL = "wss://your-domain.com/ws"; // ← замените на ваш WebSocket URL
+
+// ─── STATE ───
+let ws = null;
+let myId = null;
+let myName = "Игрок";
+let roomId = null;
+let gameState = null;
+let selectedCard = null;
+let selectedAttackCard = null;
+let gameMode = "podkidnoy";
+let isReady = false;
+
+// ─── TELEGRAM ───
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  const user = tg.initDataUnsafe?.user;
+  if (user) {
+    myId = String(user.id);
+    myName = user.first_name || "Игрок";
+  }
+}
+
+// Фоллбек — получить из URL params
+const urlParams = new URLSearchParams(window.location.search);
+if (!myId) myId = urlParams.get("user_id") || `guest_${Math.random().toString(36).slice(2,8)}`;
+if (myName === "Игрок") myName = urlParams.get("username") || "Игрок";
+
+// ─── WEBSOCKET ───
+function connectWS() {
+  showLoader("Подключение...");
+  ws = new WebSocket(WS_URL);
+
+  ws.onopen = () => {
+    hideLoader();
+    ws.send(JSON.stringify({ type: "register", player_id: myId }));
+  };
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    handleMessage(msg);
+  };
+
+  ws.onclose = () => {
+    setTimeout(connectWS, 3000);
+  };
+
+  ws.onerror = () => {
+    hideLoader();
+    showToast("❌ Ошибка соединения");
+  };
+}
+
+function send(data) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(data));
+  }
+}
+
+// ─── MESSAGE HANDLER ───
+function handleMessage(msg) {
+  switch (msg.type) {
+    case "registered":
+      myId = msg.player_id;
+      break;
+    case "room_created":
+    case "room_joined":
+      roomId = msg.room_id;
+      showScreen("waiting");
+      document.getElementById("room-code-text").textContent = roomId;
+      document.getElementById("waiting-title").textContent =
+        msg.type === "room_created" ? "Комната создана!" : "Вы в комнате!";
+      break;
+    case "match_found":
+      roomId = msg.room_id;
+      showToast("✅ Соперник найден!");
+      break;
+    case "matchmaking":
+      if (msg.status === "searching") {
+        showScreen("waiting");
+        document.getElementById("room-code-text").textContent = "🔍";
+        document.getElementById("waiting-title").textContent = "Поиск соперника";
+        document.getElementById("room-code-display").style.cursor = "default";
+        document.querySelector(".copy-hint").textContent = "ищем для вас игру";
+      }
+      break;
+    case "game_state":
+      gameState = msg.data;
+      if (msg.data.state === "playing" || msg.data.state === "finished") {
+        showScreen("game");
+        renderGame(msg.data);
+      } else {
+        renderWaiting(msg.data);
+      }
+      break;
+    case "error":
+      showToast("⚠️ " + msg.message);
+      break;
+    case "game_over":
+      showGameOver(msg);
+      break;
+    case "player_left":
+      document.getElementById("modal-disconnect").classList.add("visible");
+      break;
+  }
+}
+
+// ─── LOBBY ACTIONS ───
+function selectMode(mode) {
+  gameMode = mode;
+  document.getElementById("mode-podkidnoy").classList.toggle("active", mode === "podkidnoy");
+  document.getElementById("mode-perevodnoj").classList.toggle("active", mode === "perevodnoj");
+}
+
+function createRoom() {
+  send({ type: "create_room", name: myName, mode: gameMode });
+}
+
+function joinRoom() {
+  const code = document.getElementById("room-code-input").value.trim().toUpperCase();
+  if (!code || code.length < 4) { showToast("Введите код комнаты"); return; }
+  send({ type: "join_room", room_id: code, name: myName });
+}
+
+function startMatchmaking() {
+  send({ type: "matchmaking", name: myName, mode: gameMode });
+}
+
+function setReady() {
+  if (isReady) return;
+  isReady = true;
+  send({ type: "ready" });
+  document.getElementById("ready-btn").textContent = "✓ Готов!";
+  document.getElementById("ready-btn").disabled = true;
+}
+
+function leaveRoom() {
+  send({ type: "leave" });
+  roomId = null;
+  isReady = false;
+  showScreen("lobby");
+}
+
+function copyRoomCode() {
+  if (!roomId || roomId === "------" || roomId === "🔍") return;
+  navigator.clipboard?.writeText(roomId).then(() => showToast("📋 Код скопирован: " + roomId));
+}
+
+// ─── RENDER: WAITING ROOM ───
+function renderWaiting(state) {
+  const list = document.getElementById("players-list");
+  list.innerHTML = "";
+  (state.players || []).forEach(p => {
+    const div = document.createElement("div");
+    div.className = "player-slot" + (p.is_ready ? " ready" : "");
+    div.innerHTML = `
+      <div class="player-avatar">${p.name[0].toUpperCase()}</div>
+      <div class="player-name">${p.name}${p.id === myId ? " (Вы)" : ""}</div>
+      <div class="ready-badge">${p.is_ready ? "✓ Готов" : ""}</div>
+    `;
+    list.appendChild(div);
+  });
+
+  const count = state.players?.length || 0;
+  const statusEl = document.getElementById("waiting-status");
+  if (count < 2) {
+    statusEl.textContent = "Ждём ещё игроков...";
+  } else {
+    statusEl.textContent = `${count} игрок(а) — нажмите «Готов» для начала!`;
+  }
+
+  const modeLabel = state.game_mode === "perevodnoj" ? "Переводной" : "Подкидной";
+  document.getElementById("waiting-mode-label").textContent = `${modeLabel} дурак • 2–6 игроков`;
+}
+
+// ─── RENDER: GAME ───
+function renderGame(state) {
+  renderOpponents(state);
+  renderTable(state);
+  renderHand(state);
+  renderActionBar(state);
+  renderTopBar(state);
+  updateStatusMsg(state);
+}
+
+function renderTopBar(state) {
+  const trump = state.trump;
+  const trumpCard = state.trump_card;
+  const isRed = trump === "♥" || trump === "♦";
+  document.getElementById("trump-label").textContent = trump || "—";
+  document.getElementById("trump-card-mini").textContent = trump || "?";
+  document.getElementById("trump-card-mini").style.color = isRed ? "var(--red)" : "#111";
+  document.getElementById("deck-count").textContent = state.deck_count;
+  document.getElementById("turn-info").textContent = `Ход ${state.turn_count}`;
+
+  if (state.discard_count > 0) {
+    document.getElementById("discard-pile").style.display = "block";
+    document.getElementById("discard-count").textContent = `${state.discard_count} сбр.`;
+  }
+}
+
+function renderOpponents(state) {
+  const area = document.getElementById("opponents-area");
+  area.innerHTML = "";
+  (state.players || []).filter(p => p.id !== myId).forEach(p => {
+    const isAtk = p.id === state.attacker_id;
+    const isDef = p.id === state.defender_id;
+    const div = document.createElement("div");
+    div.className = "opponent-box" + (isAtk ? " is-attacker" : isDef ? " is-defender" : "");
+    let roleHtml = "";
+    if (isAtk) roleHtml = `<span class="role-badge role-atk">⚔ Атака</span>`;
+    if (isDef) roleHtml = `<span class="role-badge role-def">🛡 Защита</span>`;
+    const cardBacks = Array(Math.min(p.card_count, 8)).fill('<div class="opp-card-back"></div>').join("");
+    div.innerHTML = `
+      <div class="opp-name">${p.name}</div>
+      <div class="opp-cards">${cardBacks}</div>
+      <div style="font-size:11px; color:rgba(255,255,255,0.4);">${p.card_count} карт</div>
+      ${roleHtml}
+    `;
+    area.appendChild(div);
+  });
+}
+
+function renderTable(state) {
+  const slots = document.getElementById("table-slots");
+  slots.innerHTML = "";
+  (state.table || []).forEach((slot, i) => {
+    const pair = document.createElement("div");
+    pair.className = "defense-pair";
+    if (slot.attack) {
+      pair.appendChild(makeCard(slot.attack, false));
+    }
+    if (slot.defense) {
+      const dc = makeCard(slot.defense, false);
+      dc.classList.add("defense-slot");
+      pair.appendChild(dc);
+    } else if (state.is_defender && slot.attack && selectedCard) {
+      // Click-to-defend overlay handled by card selection
+    }
+    if (state.is_defender && slot.attack && !slot.defense) {
+      pair.style.cursor = "pointer";
+      pair.addEventListener("click", () => {
+        if (selectedCard) {
+          beatCard(slot.attack.id);
+        } else {
+          showToast("Сначала выберите карту из руки");
+        }
+      });
+      pair.style.outline = "2px dashed rgba(231,76,60,0.5)";
+      pair.style.borderRadius = "12px";
+    }
+    slots.appendChild(pair);
+  });
+
+  // Пустая зона если стол пуст
+  if (state.table?.length === 0 && state.can_attack) {
+    const hint = document.createElement("div");
+    hint.style.cssText = "color:rgba(255,255,255,0.3); font-size:13px; text-align:center; padding:20px;";
+    hint.textContent = "Выберите карту для атаки";
+    slots.appendChild(hint);
+  }
+}
+
+function makeCard(cardData, selectable = true) {
+  const isRed = cardData.suit === "♥" || cardData.suit === "♦";
+  const div = document.createElement("div");
+  div.className = "card " + (isRed ? "red" : "black");
+  div.dataset.id = cardData.id;
+  div.innerHTML = `
+    <div class="card-corner">${cardData.rank}<br>${cardData.suit}</div>
+    <div class="card-suit-center">${cardData.suit}</div>
+    <div class="card-corner bottom">${cardData.rank}<br>${cardData.suit}</div>
+  `;
+  if (selectable) {
+    div.addEventListener("click", () => selectHandCard(cardData.id, div));
+  }
+  return div;
+}
+
+function renderHand(state) {
+  const hand = document.getElementById("my-hand");
+  hand.innerHTML = "";
+  (state.my_hand || []).forEach(card => {
+    const el = makeCard(card, true);
+    if (selectedCard === card.id) el.classList.add("selected");
+    hand.appendChild(el);
+  });
+}
+
+function renderActionBar(state) {
+  const bar = document.getElementById("action-bar");
+  bar.innerHTML = "";
+
+  if (state.is_defender) {
+    addActionBtn(bar, "📥 Взять", "btn-take", takeCards);
+    if (state.game_mode === "perevodnoj" && state.table?.length === 1 && !state.table[0].defense) {
+      addActionBtn(bar, "🔄 Перевести", "btn-transfer", transferCard);
+    }
+  }
+
+  if (state.can_attack) {
+    const allBeaten = state.table?.length > 0 && state.table.every(s => s.defense !== null);
+    if (allBeaten) {
+      addActionBtn(bar, "✓ Завершить ход", "btn-end", endTurn);
+    }
+    if (state.table?.length > 0) {
+      addActionBtn(bar, "➕ Подкинуть", "btn-beat", () => {
+        if (!selectedCard) showToast("Выберите карту для подкидывания");
+        else attackCard();
+      });
+    } else {
+      addActionBtn(bar, "⚔ Атаковать", "btn-beat", () => {
+        if (!selectedCard) showToast("Выберите карту для атаки");
+        else attackCard();
+      });
+    }
+  }
+}
+
+function addActionBtn(container, text, cls, handler) {
+  const btn = document.createElement("button");
+  btn.className = "action-btn " + cls;
+  btn.textContent = text;
+  btn.addEventListener("click", handler);
+  container.appendChild(btn);
+}
+
+function updateStatusMsg(state) {
+  const el = document.getElementById("status-msg");
+  const me = state.players?.find(p => p.id === myId);
+  const attacker = state.players?.find(p => p.id === state.attacker_id);
+  const defender = state.players?.find(p => p.id === state.defender_id);
+
+  if (state.is_defender) {
+    el.textContent = "🛡 Ваша защита — отбейте карты или возьмите";
+    el.style.color = "#e74c3c";
+  } else if (state.can_attack) {
+    el.textContent = "⚔ Ваш ход — атакуйте!";
+    el.style.color = "var(--gold-light)";
+  } else {
+    const atkName = attacker?.id === myId ? "Вы" : attacker?.name || "?";
+    const defName = defender?.id === myId ? "Вы" : defender?.name || "?";
+    el.textContent = `${atkName} атакует → ${defName} защищается`;
+    el.style.color = "rgba(255,255,255,0.5)";
+  }
+}
+
+// ─── CARD ACTIONS ───
+function selectHandCard(cardId, el) {
+  if (selectedCard === cardId) {
+    // Снять выделение
+    selectedCard = null;
+    document.querySelectorAll(".my-hand .card").forEach(c => c.classList.remove("selected"));
+    return;
+  }
+  selectedCard = cardId;
+  document.querySelectorAll(".my-hand .card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+
+  // Если это защита и на столе одна неотбитая карта — автоотбить
+  if (gameState?.is_defender) {
+    const openSlots = gameState.table?.filter(s => !s.defense);
+    if (openSlots?.length === 1) {
+      beatCard(openSlots[0].attack.id);
+    }
+  } else if (gameState?.can_attack && gameState?.table?.length === 0) {
+    // Автоатака при первом ходе
+    attackCard();
+  }
+}
+
+function attackCard() {
+  if (!selectedCard) return;
+  send({ type: "action", action: "attack", card_id: selectedCard });
+  selectedCard = null;
+}
+
+function beatCard(attackCardId) {
+  if (!selectedCard) { showToast("Выберите карту для отбоя"); return; }
+  send({ type: "action", action: "defend", attack_card_id: attackCardId, defense_card_id: selectedCard });
+  selectedCard = null;
+}
+
+function transferCard() {
+  if (!selectedCard) { showToast("Выберите карту для перевода"); return; }
+  send({ type: "action", action: "transfer", card_id: selectedCard });
+  selectedCard = null;
+}
+
+function takeCards() {
+  send({ type: "action", action: "take" });
+  selectedCard = null;
+}
+
+function endTurn() {
+  send({ type: "action", action: "end_turn" });
+  selectedCard = null;
+}
+
+// ─── GAME OVER ───
+function showGameOver(msg) {
+  document.getElementById("modal-gameover").classList.add("visible");
+  if (msg.is_loser) {
+    document.getElementById("gameover-icon").textContent = "🤡";
+    document.getElementById("gameover-title").textContent = "Вы дурак!";
+    document.getElementById("gameover-sub").textContent = "В следующий раз повезёт!";
+  } else {
+    document.getElementById("gameover-icon").textContent = "🏆";
+    document.getElementById("gameover-title").textContent = "Победа!";
+    document.getElementById("gameover-sub").textContent = `${msg.loser_name} остался с картами!`;
+  }
+}
+
+// ─── UI HELPERS ───
+function showScreen(name) {
+  document.getElementById("screen-lobby").style.display = name === "lobby" ? "flex" : "none";
+  document.getElementById("screen-waiting").style.display = name === "waiting" ? "flex" : "none";
+  document.getElementById("screen-game").style.display = name === "game" ? "flex" : "none";
+}
+
+function showLoader(text) {
+  document.getElementById("loader-text").textContent = text || "Загрузка...";
+  document.getElementById("loader").classList.add("visible");
+}
+
+function hideLoader() {
+  document.getElementById("loader").classList.remove("visible");
+}
+
+function showToast(msg, duration = 2500) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), duration);
+}
+
+// ─── INIT ───
+showScreen("lobby");
+connectWS();
+</script>
+</body>
+</html>
